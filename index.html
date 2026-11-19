@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Temas 5 y 6: Acreedores, deudores, efectos y periodificación (app)</title>
+<style>
+:root{--ink:#1c2433;--mut:#5d6778;--line:#e2e6ee;--bg:#f4f6fa;--card:#fff;--acc:#1f4e79;--acc2:#2e75b6;--soft:#eaf1f9;--ok:#1e7b43;--okbg:#e6f5ec;--bad:#b3261e;--badbg:#fdeceb;--warn:#8a5a00;--warnbg:#fff6df;--gold:#c9a227}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:15px}
+/* cabecera */
+.top{background:linear-gradient(135deg,#1f4e79 0%,#2e75b6 100%);color:#fff;padding:22px 24px 0}
+.top .wrap{max-width:1180px;margin:0 auto}
+.top h1{font-size:22px;margin:0 0 4px;font-weight:700;letter-spacing:.2px}
+.top .sub{opacity:.85;font-size:13px;margin-bottom:14px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px}
+.tabs button{background:transparent;color:#dbe8f6;border:0;border-bottom:3px solid transparent;padding:10px 16px;cursor:pointer;font-size:14px;font-weight:600;border-radius:8px 8px 0 0}
+.tabs button:hover{background:rgba(255,255,255,.12)}
+.tabs button.on{background:var(--bg);color:var(--acc);border-bottom-color:var(--gold)}
+/* layout */
+main{max-width:1180px;margin:0 auto;padding:24px}
+.view{display:none}
+.view.on{display:block}
+.layout{display:grid;grid-template-columns:250px 1fr;gap:24px;align-items:start}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.side{position:static!important}}
+.side{position:sticky;top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.side h4{margin:4px 8px 8px;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--mut)}
+.side a{display:block;color:var(--ink);text-decoration:none;padding:7px 10px;border-radius:8px;font-size:13.5px}
+.side a:hover{background:var(--soft);color:var(--acc)}
+.side a.on{background:var(--soft);color:var(--acc);font-weight:600}
+.side .n{display:inline-block;width:22px;color:var(--acc2);font-weight:700}
+/* tarjetas */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:0 0 18px;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+.card h2{margin:0 0 6px;font-size:20px;color:var(--acc)}
+.card h3{margin:20px 0 6px;font-size:15.5px;color:var(--ink);border-left:3px solid var(--acc2);padding-left:9px}
+.card p{margin:8px 0}
+.kicker{font-size:12px;text-transform:uppercase;letter-spacing:.9px;color:var(--acc2);font-weight:700}
+.lead{color:var(--mut);margin-top:0}
+ul.k{margin:6px 0 6px 20px;padding:0}
+ul.k li{margin:4px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.box{border-radius:12px;padding:14px 16px;font-size:14px}
+.box.tip{background:var(--soft);border:1px solid #cfe0f3}
+.box.warn{background:var(--warnbg);border:1px solid #f1dca0;color:#5a3c00}
+.box.ok{background:var(--okbg);border:1px solid #c4e6d0}
+.box b{display:block;margin-bottom:4px}
+.tag{display:inline-block;background:var(--soft);color:var(--acc);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;margin:2px 4px 2px 0;border:1px solid #cfe0f3}
+.tag.doc{background:#f1f5ef;color:#2f5d1d;border-color:#d4e6c6}
+.tag.code{background:#fff;color:var(--acc);font-family:Consolas,monospace;font-weight:700}
+table{border-collapse:separate;border-spacing:0;width:100%;margin:10px 0 14px;font-size:14px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{background:#f0f4fa;color:var(--acc);font-size:12.5px;text-transform:uppercase;letter-spacing:.4px}
+td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.ind{padding-left:26px;color:#33405a}
+tr.sub td{background:#fbfcfe}
+.ej{border:1px solid var(--line);border-left:5px solid var(--acc2);border-radius:12px;padding:16px 18px;margin:0 0 18px;background:#fff}
+.ej h3{margin:0 0 4px;font-size:16px;color:var(--acc)}
+.ej .enun{margin:6px 0 4px}
+.ej .doc{font-size:13px;color:var(--mut)}
+.ej.ex{border-left-color:var(--gold)}
+.ej.ex h3{color:#7a5c00}
+details{margin:8px 0 2px;border:1px solid var(--line);border-radius:10px;background:#fbfcfe}
+details summary{cursor:pointer;padding:9px 14px;font-weight:600;color:var(--acc2);list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary:before{content:"▸ ";color:var(--gold)}
+details[open] summary:before{content:"▾ "}
+details>div{padding:0 14px 12px}
+.search{width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;margin:4px 0 14px;background:#fff}
+.docfig{margin:14px 0;text-align:center}
+.docfig img{max-width:100%;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(20,30,50,.06)}
+.docfig figcaption{font-size:12.5px;color:var(--mut);margin-top:6px;font-style:italic}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.gal .card{margin:0;padding:14px}
+/* test */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:18px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input.name{padding:10px 14px;border:1px solid #cdd5e1;border-radius:10px;font-size:15px;min-width:280px;flex:1}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;font-size:14px;font-weight:600}
+.btn:hover{background:var(--acc2)}
+.btn.sec{background:#fff;color:var(--acc);border:1px solid #b9c8dc}
+.btn.sec:hover{background:var(--soft)}
+.btn.hint{background:#fff;color:var(--warn);border:1px solid #e6c57a;padding:6px 12px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:default}
+select.sel{padding:9px 12px;border:1px solid #cdd5e1;border-radius:10px;font-size:14px;background:#fff}
+.progress{height:10px;background:#e7edf5;border-radius:999px;overflow:hidden;margin:14px 0 6px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--acc2),var(--gold));transition:width .3s}
+.stat{font-size:13px;color:var(--mut)}
+.q{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+.q .t{font-weight:700;margin-bottom:8px;color:var(--ink)}
+.q label{display:block;padding:8px 12px;margin:4px 0;border:1px solid var(--line);border-radius:9px;cursor:pointer;background:#fff}
+.q label:hover{background:#f7fafe;border-color:#bcd0e8}
+.q label.picked{background:var(--soft);border-color:var(--acc2)}
+.q label.right{background:var(--okbg);border-color:#8fcca6}
+.q label.wrong{background:var(--badbg);border-color:#eeaaa5}
+.q input{margin-right:8px}
+.pista{display:none;background:var(--warnbg);border:1px solid #f1dca0;border-radius:9px;padding:8px 12px;margin-top:8px;font-size:14px;color:#5a3c00}
+.pista.on{display:block}
+.res{font-size:13.5px;margin-top:10px;padding:7px 11px;border-radius:8px;font-weight:600}
+.res.ok{background:var(--okbg);color:var(--ok)}
+.res.bad{background:var(--badbg);color:var(--bad)}
+.res.sin{background:#f1f2f4;color:var(--mut)}
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.score div{background:var(--soft);border-radius:12px;padding:12px 14px}
+.score b{display:block;font-size:22px;color:var(--acc)}
+.score span{font-size:12.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.msg{font-size:14px;color:var(--mut);margin-top:8px;min-height:20px}
+.hide{display:none}
+.foot{font-size:12.5px;color:var(--mut);margin-top:24px;text-align:center}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <h1>Temas 5 y 6: acreedores, deudores, efectos y periodificación</h1>
+  <div class="sub">PGC PYMES · Tratamiento de la Documentación Contable · Grado medio</div>
+  <nav class="tabs">
+    <button class="tab on" data-v="teoria">Teoría</button>
+    <button class="tab" data-v="ejemplos">Ejemplos resueltos</button>
+    <button class="tab" data-v="practica">Ejercicios</button>
+    <button class="tab" data-v="documentos">Documentos</button>
+    <button class="tab" data-v="test">Autoevaluación</button>
+  </nav>
+</div></div>
+
+<main>
+
+<!-- ============ TEORÍA ============ -->
+<div id="v-teoria" class="view on">
+<div class="layout">
+<aside class="side" id="sideT">
+  <h4>Contenidos</h4>
+  <a href="#t1"><span class="n">1</span>Efectos comerciales</a>
+  <a href="#t2"><span class="n">2</span>Clientes de dudoso cobro</a>
+  <a href="#t3"><span class="n">3</span>Envases retornables</a>
+  <a href="#t4"><span class="n">4</span>Anticipos</a>
+  <a href="#t5"><span class="n">5</span>Grupos 410 y 440</a>
+  <a href="#t6"><span class="n">6</span>Descuento de efectos</a>
+  <a href="#t7"><span class="n">7</span>Gestión de cobro</a>
+  <a href="#t8"><span class="n">8</span>Personal (grupo 46)</a>
+  <a href="#t9"><span class="n">9</span>Periodificación 480/485</a>
+  <a href="#t10"><span class="n">10</span>Deterioro de créditos</a>
+</aside>
+<div>
+
+<section class="card" id="t0">
+  <div class="kicker">Antes de empezar</div>
+  <h2>Documento, asiento y cuenta</h2>
+  <p class="lead">En Documentación Contable cada asiento nace de un documento. Antes de tocar una cuenta conviene preguntarse qué papel justifica la operación.</p>
+  <table>
+    <tr><th>Documento</th><th>Qué prueba</th><th>Asiento que origina</th></tr>
+    <tr><td>Factura de venta o compra</td><td>Que existe una operación comercial y su IVA</td><td>430 / 400 frente a 700 / 600 y 477 / 472</td></tr>
+    <tr><td>Letra o pagaré</td><td>Que el pago se aplaza y quién se compromete</td><td>431 / 411 (efectos en cartera o a pagar)</td></tr>
+    <tr><td>Nota del banco</td><td>Lo que el banco ha cobrado, descontado o devuelto</td><td>572, 5208, 665, 626, 4315</td></tr>
+    <tr><td>Nómina y recibo de salarios</td><td>Salario, retenciones y cotizaciones</td><td>640, 475, 476, 465, 642</td></tr>
+  </table>
+  <div class="box tip"><b>Idea clave</b>La cuenta no se elige de memoria: se elige según quién debe a quién y cuándo se pagará. Por eso las subcuentas de 43 y 41 se leen como “lo que me deben” y “lo que debo”.</div>
+</section>
+
+<section class="card" id="t1">
+  <div class="kicker">Tema 5 · Efectos comerciales</div>
+  <h2>1. Efectos comerciales</h2>
+  <p>Un efecto comercial es un documento de crédito que sustituye el pago en efectivo de una operación comercial. El deudor se compromete a pagar en una fecha futura, el vencimiento. Permite a las pymes financiar sus ventas o sus compras sin esperar al cobro o al pago inmediato.</p>
+  <h3>Tipos de efectos</h3>
+  <table>
+    <tr><th>Efecto</th><th>Quién lo emite</th><th>Uso habitual en pymes</th></tr>
+    <tr><td><b>Letra de cambio</b></td><td>El acreedor ordena al deudor pagar; el deudor la acepta firmándola</td><td>Compraventa a plazo entre empresas</td></tr>
+    <tr><td><b>Pagaré</b></td><td>El propio deudor promete pagar</td><td>Aplazar compras a proveedores</td></tr>
+    <tr><td><b>Recibo domiciliado</b></td><td>El acreedor, con cargo en la cuenta del deudor</td><td>Suministros, cuotas y servicios periódicos (el más común)</td></tr>
+    <tr><td><b>Cheque</b></td><td>El librador, a la vista</td><td>Pago inmediato; no es un efecto a plazo</td></tr>
+  </table>
+  <p>Los más comunes en pymes son la <b>letra de cambio</b> y el <b>recibo domiciliado</b>.</p>
+  <h3>Cuentas que controlan los efectos</h3>
+  <p>Dentro de la cuenta 43 de clientes, los efectos se controlan en la serie 431, y en la 41 de acreedores existe la 411 para los efectos a pagar.</p>
+  <table>
+    <tr><th>Cuenta</th><th>Significado</th><th>Naturaleza</th></tr>
+    <tr><td class="n">4310</td><td>Efectos comerciales en cartera (aún no presentados al banco)</td><td>Deudora</td></tr>
+    <tr><td class="n">4311</td><td>Efectos comerciales descontados (presentados al banco para anticipar el cobro)</td><td>Deudora</td></tr>
+    <tr><td class="n">4312</td><td>Efectos comerciales en gestión de cobro (enviados al banco para cobrar)</td><td>Deudora</td></tr>
+    <tr><td class="n">4315</td><td>Efectos comerciales impagados</td><td>Deudora</td></tr>
+    <tr><td class="n">411</td><td>Acreedores, efectos comerciales a pagar</td><td>Acreedora</td></tr>
+    <tr><td class="n">441</td><td>Deudores, efectos comerciales a cobrar</td><td>Deudora</td></tr>
+  </table>
+  <h3>Cómo se registra</h3>
+  <ul class="k">
+    <li>Al recibir la letra del cliente, se pasa la deuda de 430 a 4310 (ejemplos 1 y 2 del tema).</li>
+    <li>Cuando el efecto se vence y se cobra, la cuenta de efectos se cancela con 572 Bancos.</li>
+    <li>Un efecto que el deudor no paga es un impagado: se traslada a 4315 y se reclama.</li>
+  </ul>
+  <div class="box warn"><b>Error frecuente</b>Confundir 430 con 4310: la 430 es la factura pendiente del cliente, y el efecto es el documento que la sustituye. No se deben duplicar los dos saldos.</div>
+</section>
+
+<section class="card" id="t2">
+  <div class="kicker">Tema 5 · Riesgo de impago</div>
+  <h2>2. Clientes de dudoso cobro</h2>
+  <p>Cuando un cliente entra en concurso o hay un riesgo claro de que no pague, el saldo deja de ser un derecho corriente. Se traslada de la 430 a la <b>436 Clientes de dudoso cobro</b>. Si el deudor deja de ser cliente habitual, la cuenta equivalente de deudores es la <b>445 Deudores de dudoso cobro</b>.</p>
+  <div class="grid2">
+    <div class="box tip"><b>Qué cuentas participan</b>436 (activo, el crédito dudoso), 430 (de donde sale) y 490 (la corrección de valor o provisión).</div>
+    <div class="box tip"><b>Qué documento lo justifica</b>La comunicación del concurso o del impago, o el informe que acredite la insolvencia.</div>
+  </div>
+  <h3>Estimación del deterioro</h3>
+  <p>La provisión se dota al cierre cuando hay indicios de impago. En el ejemplo 4 se estima un deterioro del 50 %, es decir 605 € sobre una deuda de 1.210 €. El gasto va a la <b>694</b> y la corrección de valor a la <b>490</b>, que reduce el activo.</p>
+  <h3>Regla de oro</h3>
+  <p>La provisión no elimina la deuda: la reconoce como pérdida probable. Si el cliente paga después, se revierte con la <b>790</b>; si se declara incobrable, se da de baja con la cuenta de provisión y el resto se lleva a gasto.</p>
+</section>
+
+<section class="card" id="t3">
+  <div class="kicker">Tema 5 · Envases retornables</div>
+  <h2>3. Envases y embalajes retornables de clientes</h2>
+  <p>Cuando la pyme vende en envases que el cliente debe devolver (bombonas, palés, cajas de reparto), suele cobrar un <b>depósito</b> que se reembolsa al devolver el envase. Ese depósito no es una venta: minora el saldo de 430 hasta que el envase vuelve. Se registra en la <b>437 Envases y embalajes a devolver por clientes</b>; la pyme compradora lo anota en la <b>406 Envases y embalajes a devolver a proveedores</b>.</p>
+  <h3>Tres situaciones</h3>
+  <table>
+    <tr><th>Situación</th><th>Tratamiento</th><th>IVA</th></tr>
+    <tr><td><b>Venta con envases</b></td><td>El depósito se carga al cliente (430) y se abona a 437</td><td>Sin IVA sobre el depósito</td></tr>
+    <tr><td><b>Devolución del envase</b></td><td>Se cancela 437 con 572 al reembolsar el depósito</td><td>Sin IVA: no hay operación sujeta</td></tr>
+    <tr><td><b>Envase no devuelto</b></td><td>El depósito deja de ser garantía y pasa a ser una venta de envases: 704 por la base</td><td><b>Sí</b>: 477 por la cuota (21 %) repercutida al cliente</td></tr>
+  </table>
+  <div class="box warn"><b>Atención al IVA</b>Mientras el envase vuelve, el depósito no forma parte de la base imponible. Si no vuelve, sí: 400 € de depósito generan 84 € de IVA. Es el error más habitual en los exámenes.</div>
+  <h3>Documentos</h3>
+  <p><span class="tag doc">Factura de venta con línea de envases</span> <span class="tag doc">Justificante de devolución o abono</span></p>
+</section>
+
+<section class="card" id="t4">
+  <div class="kicker">Tema 5 · Anticipos</div>
+  <h2>4. Anticipos</h2>
+  <p>Un anticipo es un pago previo a la entrega del bien o del servicio. Según quién lo reciba, la cuenta cambia de naturaleza.</p>
+  <div class="grid2">
+    <div class="box tip"><b>Anticipo a proveedores · 407</b>La pyme paga antes de recibir. Es un derecho frente al proveedor (activo). El IVA soportado se registra en 472 cuando se paga, si el anticipo es con IVA.</div>
+    <div class="box tip"><b>Anticipo de clientes · 438</b>El cliente paga antes de recibir. Es una deuda de la pyme hasta que entrega el bien (pasivo).</div>
+  </div>
+  <h3>Regularización con la factura</h3>
+  <p>Cuando llega la factura definitiva, el anticipo se cancela y el importe pagado se descuenta del total. No hay que duplicar el IVA: el de la factura incluye el del anticipo, que se regulariza. Ambas partes lo hacen, cada una en su cuenta.</p>
+  <h3>4.1 Anticipo a proveedor (la pyme paga)</h3>
+  <p>Muebles Roca paga 300 € + IVA a Maderas del Sur antes de recibir la mercancía. Desde la pyme compradora es un <b>407</b>; desde el proveedor es un <b>438</b>. El IVA se devenga al cobrar: el proveedor lo repercute (477) y la compradora lo soporta (472) en ese momento. Ejemplos 8 y 9.</p>
+  <h3>4.2 Anticipo de cliente (la pyme cobra)</h3>
+  <p>Distribuciones López paga 605 € (500 € + 105 € de IVA) a Muebles Roca por un mobiliario de 1.000 € + IVA. Desde Muebles Roca es un <b>438</b>; desde López es un <b>407</b>. Ejemplos 8 bis y 9 bis.</p>
+  <div class="box ok"><b>Comprobación</b>El IVA neto soportado debe ser el de la factura: 210 €. Los 63 € del anticipo ya estaban registrados; al regularizar se restan para no contarlos dos veces.</div>
+</section>
+
+<section class="card" id="t5">
+  <div class="kicker">Tema 5 · Grupos 410 y 440</div>
+  <h2>5. Acreedores y deudores por prestaciones de servicios</h2>
+  <p>Las operaciones de servicios usan los grupos de acreedores y deudores que, a diferencia de la compraventa de mercaderías, no pasan por existencias.</p>
+  <table>
+    <tr><th>Cuenta</th><th>Qué es</th><th>Ejemplo</th></tr>
+    <tr><td><b>410</b> Acreedores por prestaciones de servicios</td><td>Lo que la pyme debe a quien le presta un servicio</td><td>Factura de una gestoría</td></tr>
+    <tr><td><b>440</b> Deudores</td><td>Lo que un cliente debe a la pyme por un servicio prestado</td><td>Factura de formación</td></tr>
+    <tr><td><b>411</b> / <b>441</b></td><td>Lo mismo cuando la deuda se instrumenta en un efecto</td><td>Pagaré o letra</td></tr>
+  </table>
+  <div class="box tip"><b>Cadena documental</b>Factura (410 o 440) → efecto (411 o 441) → pago o cobro en el banco (572). Cada paso tiene su documento.</div>
+  <p>El IVA de los servicios se registra igual que el de las mercaderías: 472 si lo soporta la pyme y 477 si lo repercute. En el ejemplo 11 la formación de 2.000 € + IVA genera 420 € de 477.</p>
+</section>
+
+<section class="card" id="t6">
+  <div class="kicker">Tema 6 · Descuento</div>
+  <h2>6. Descuento de efectos en el banco</h2>
+  <p>Descontar un efecto es presentarlo al banco antes del vencimiento para cobrar hoy su importe menos los intereses y gastos. La pyme anticipa el dinero, pero sigue siendo responsable del pago si el cliente no paga (descuento con recurso).</p>
+  <h3>Cómo se registra</h3>
+  <ul class="k">
+    <li>El efecto sale de la cartera: <span class="tag code">4311</span> al debe, <span class="tag code">4310</span> al haber.</li>
+    <li>El banco abona el importe neto: <span class="tag code">572</span> al debe.</li>
+    <li>Los intereses y gastos van a <span class="tag code">665</span> al debe.</li>
+    <li>La deuda con el banco aparece en <span class="tag code">5208</span> al haber por el nominal.</li>
+  </ul>
+  <h3>Vencimiento e impago</h3>
+  <p>Si el cliente paga al banco, la 5208 se cancela contra la 4311. Si no paga, el banco carga el importe a la pyme: la 5208 se cancela con 572 y el efecto pasa a <b>4315</b> para reclamarlo al cliente.</p>
+  <div class="box warn"><b>Error frecuente</b>No usar 5105 ni 662 para el descuento: en el PGC PYMES la deuda con el banco es 5208 y los intereses van a 665.</div>
+</section>
+
+<section class="card" id="t7">
+  <div class="kicker">Tema 6 · Gestión de cobro</div>
+  <h2>7. Gestión de cobro de efectos</h2>
+  <p>En la gestión de cobro la pyme envía el efecto al banco para que lo cobre a su vencimiento, pero <b>no recibe el dinero por adelantado</b>. No hay deuda con el banco: el banco actúa como mandatario y solo abona el importe cuando el cliente paga.</p>
+  <table>
+    <tr><th>Concepto</th><th>Descuento</th><th>Gestión de cobro</th></tr>
+    <tr><td>Cuenta del efecto</td><td>4311</td><td>4312</td></tr>
+    <tr><td>Deuda con el banco</td><td>Sí (5208)</td><td>No</td></tr>
+    <tr><td>Intereses y gastos</td><td>665</td><td>626 (comisión)</td></tr>
+    <tr><td>Si no paga el cliente</td><td>El banco carga la pyme</td><td>El efecto vuelve a la pyme como impagado (4315)</td></tr>
+  </table>
+  <div class="box tip"><b>Diferencia clave</b>Con el descuento la pyme financia el cobro; con la gestión de cobro solo lo encarga. Por eso la deuda con el banco solo existe en el descuento.</div>
+</section>
+
+<section class="card" id="t8">
+  <div class="kicker">Tema 6 · Personal</div>
+  <h2>8. Personal (grupo 46): anticipos y remuneraciones pendientes</h2>
+  <p>La nómina genera gastos de personal (<b>640</b> Sueldos y salarios; <b>642</b> Seguridad Social a cargo de la empresa). Del salario bruto salen las retenciones y las cotizaciones del trabajador, que la pyme debe ingresar a terceros:</p>
+  <ul class="k">
+    <li><b>475</b> Hacienda Pública, acreedora por retenciones (IRPF).</li>
+    <li><b>476</b> Organismos de la Seguridad Social, acreedores (cotizaciones del trabajador y de la empresa).</li>
+  </ul>
+  <h3>Cuentas del grupo 46</h3>
+  <ul class="k">
+    <li><b>460 Anticipos de remuneraciones</b> (activo): el trabajador ha cobrado antes de tiempo. Se descuenta en la siguiente nómina.</li>
+    <li><b>465 Remuneraciones pendientes de pago</b> (pasivo): salarios devengados y aún no pagados. Es una deuda con el personal.</li>
+  </ul>
+  <h3>Ejemplo de nómina con anticipo</h3>
+  <p>Salario bruto de 2.000 €, IRPF del 15 % (300 €), cotización del trabajador de 127 €, anticipo de 200 € y cotización de la empresa de 600 €. El líquido a pagar es de 1.373 € (2.000 − 300 − 127 − 200). Ver ejemplo 19 en la pestaña de ejemplos.</p>
+  <div class="box ok"><b>Comprobación</b>Del total devengado (2.000 €) salen 300 + 127 + 200 + 1.373 = 2.000 €. Si no cuadra, falta una retención.</div>
+</section>
+
+<section class="card" id="t9">
+  <div class="kicker">Tema 6 · Periodificación</div>
+  <h2>9. Ajustes por periodificación: cuentas 480 y 485</h2>
+  <p>El principio de devengo exige imputar cada gasto e ingreso al ejercicio en que se produce, no en el que se paga o se cobra. Cuando un pago o un cobro cubre varios ejercicios se hace un ajuste al cierre.</p>
+  <div class="grid2">
+    <div class="box tip"><b>480 Gastos anticipados</b>Activo. Se paga hoy un gasto de meses futuros (un seguro anual, por ejemplo).</div>
+    <div class="box tip"><b>485 Ingresos anticipados</b>Pasivo. Se cobra hoy un ingreso que aún no se ha ganado (un alquiler cobrado por adelantado).</div>
+  </div>
+  <h3>Ejemplo: seguro anual</h3>
+  <p>El 1 de julio se paga un seguro de 1.200 € por 12 meses. Al 31 de diciembre han pasado 6 meses: 600 € son gasto del ejercicio y 600 € quedan en 480.</p>
+  <h3>Ejemplo: alquiler cobrado por adelantado</h3>
+  <p>El 1 de octubre se cobran 2.400 € de alquiler por 12 meses. Al cierre han pasado 3 meses: 600 € son ingreso y 1.800 € quedan en 485.</p>
+  <div class="box warn"><b>Error frecuente</b>Olvidar el ajuste de cierre. Sin él, el ejercicio tiene más gasto o más ingreso del que le corresponde.</div>
+</section>
+
+<section class="card" id="t10">
+  <div class="kicker">Tema 6 · Deterioro</div>
+  <h2>10. Deterioro de créditos comerciales</h2>
+  <p>Si un crédito comercial puede no cobrarse, se estima la pérdida al cierre. Tres cuentas intervienen:</p>
+  <table>
+    <tr><th>Cuenta</th><th>Papel</th><th>Naturaleza</th></tr>
+    <tr><td><b>694</b> Pérdidas por deterioro de créditos comerciales</td><td>Gasto de la dotación</td><td>Deudora (gasto)</td></tr>
+    <tr><td><b>490</b> Deterioro de valor de créditos comerciales</td><td>Corrección de valor que reduce el activo</td><td>Acreedora</td></tr>
+    <tr><td><b>790</b> Reversión del deterioro</td><td>Ingreso cuando el cliente paga después</td><td>Acreedora (ingreso)</td></tr>
+  </table>
+  <h3>Reversión</h3>
+  <p>El cliente del ejemplo 3 paga la factura completa de 1.210 € que tenía un deterioro de 605 €. El cobro entra en bancos, la deuda se cancela en 436 y la provisión vuelve a resultados como ingreso (790).</p>
+  <h3>Baja por insolvencia y recuperación del IVA</h3>
+  <p>Si la deuda se declara incobrable y se cumplen los requisitos del artículo 80 de la Ley del IVA, la cuota de 210 € se recupera con cargo a 477. La pérdida restante de la base (395 €) se lleva a gasto con 694 (ejemplo 24).</p>
+  <div class="box ok"><b>Recuerda</b>Sin cumplir las condiciones del artículo 80, no se recupera el IVA. Consulta siempre el requisito antes de regularizar.</div>
+</section>
+
+<section class="card">
+  <div class="kicker">Para repasar</div>
+  <h2>Tabla resumen de cuentas</h2>
+  <table>
+    <tr><th>Cuenta</th><th>Nombre</th><th>Naturaleza</th></tr>
+    <tr><td class="n">407</td><td>Anticipos a proveedores</td><td>Deudora</td></tr>
+    <tr><td class="n">410 / 411</td><td>Acreedores por servicios / efectos a pagar</td><td>Acreedora</td></tr>
+    <tr><td class="n">430 / 436</td><td>Clientes / clientes de dudoso cobro</td><td>Deudora</td></tr>
+    <tr><td class="n">406 / 437</td><td>Envases y embalajes a devolver a proveedores / por clientes</td><td>Deudora / acreedora (minora 430)</td></tr>
+    <tr><td class="n">438</td><td>Anticipos de clientes</td><td>Acreedora</td></tr>
+    <tr><td class="n">440 / 441</td><td>Deudores / efectos a cobrar</td><td>Deudora</td></tr>
+    <tr><td class="n">4310–4315</td><td>Efectos en cartera, descontados, gestión de cobro, impagados</td><td>Deudora</td></tr>
+    <tr><td class="n">460 / 465</td><td>Anticipos de remuneraciones / remuneraciones pendientes</td><td>Deudora / acreedora</td></tr>
+    <tr><td class="n">475 / 476</td><td>HP acreedora por retenciones / SS acreedora</td><td>Acreedora</td></tr>
+    <tr><td class="n">480 / 485</td><td>Gastos anticipados / ingresos anticipados</td><td>Deudora / acreedora</td></tr>
+    <tr><td class="n">490 / 694 / 790</td><td>Deterioro / pérdidas por deterioro / reversión</td><td>Acreedora / deudora / acreedora</td></tr>
+    <tr><td class="n">5208 / 665</td><td>Deudas por efectos descontados / intereses por descuento</td><td>Acreedora / deudora</td></tr>
+  </table>
+</section>
+
+<div class="foot">Los códigos siguen el cuadro de cuentas del PGC PYMES. Contrástalos con el libro de texto antes de examinar.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ EJEMPLOS ============ -->
+<div id="v-ejemplos" class="view">
+  <div class="card"><div class="kicker">Ejemplos resueltos</div><h2>Operación, documento y asiento</h2><p class="lead">Cada ejemplo indica el documento que lo justifica. Busca por palabra: “envase”, “anticipo”, “descuento”, “IVA”…</p><input class="search" id="buscaEj" placeholder="Buscar ejemplo…"></div>
+  <div id="listaEj"></div>
+</div>
+
+<!-- ============ EJERCICIOS ============ -->
+<div id="v-practica" class="view">
+  <div class="card"><div class="kicker">Ejercicios para practicar</div><h2>Resuelve antes de mirar</h2><p class="lead">Intenta cada asiento en tu libro diario. Después despliega la solución para comprobar cuentas e importes.</p></div>
+  <div id="listaEx"></div>
+</div>
+
+<!-- ============ DOCUMENTOS ============ -->
+<div id="v-documentos" class="view">
+  <div class="card"><div class="kicker">Documentos</div><h2>Documentos que justifican los asientos</h2><p class="lead">Facturas, letras, pagarés, justificantes, notas bancarias y nóminas con datos ficticios. Cada documento aparece también junto al ejemplo que lo utiliza.</p></div>
+  <div id="galeria" class="gal"></div>
+</div>
+
+<!-- ============ TEST ============ -->
+<div id="v-test" class="view">
+  <div class="panel">
+    <div class="kicker">Autoevaluación</div>
+    <h2 style="margin:4px 0 6px;color:var(--acc)">Test de 20 preguntas</h2>
+    <p class="lead" style="margin-top:0">Se eligen 20 preguntas al azar de un banco de 100. <b>Acierto +1</b> · <b>Fallo −0,33</b> · <b>Cada pista −0,25</b> · sin responder 0. Nota sobre 10 = puntos ÷ 2 (mínimo 0).</p>
+    <div class="row">
+      <input class="name" id="nombre" placeholder="Nombre y apellidos">
+      <button class="btn" id="btnNuevo">Nuevo test</button>
+    </div>
+    <div class="msg" id="msgInicio"></div>
+    <div class="progress"><div id="barra"></div></div>
+    <div class="stat" id="contador"></div>
+  </div>
+  <div id="preguntas"></div>
+  <div class="panel">
+    <div class="row">
+      <button class="btn" id="btnCorregir">Corregir</button>
+      <select class="sel" id="metodo"><option value="archivo">Descargar archivo</option><option value="copia">Copiar informe</option></select>
+      <button class="btn" id="btnEnviar">Guardar / enviar</button>
+    </div>
+    <div class="msg" id="msgEnvio"></div>
+    <div id="resultado"></div>
+  </div>
+</div>
+
+</main>
+<div class="foot" style="padding-bottom:30px">Temas 5 y 6 · Tratamiento de la Documentación Contable</div>
+
+<script>
+/* ---------- EJEMPLOS: [titulo, enunciado, documento, filas[fecha,cuenta,debe,haber]] ---------- */
+const EJEMPLOS = [
+["Ejemplo 1. Venta a crédito con letra","Venta de mercaderías por 1.000 € + IVA (210 €); el cliente acepta una letra a 60 días.","Factura de venta; letra aceptada",[["##","Pyme vendedora (emite la factura y recibe la letra)"],["01/03","430 Clientes","1.210,00",""],["","700 Ventas de mercaderías","","1.000,00"],["","477 HP, IVA repercutido","","210,00"],["01/03","4310 Efectos comerciales en cartera","1.210,00",""],["","430 Clientes","","1.210,00"],["##","Pyme compradora (acepta la letra)"],["01/03","600 Compras de mercaderías","1.000,00",""],["","472 HP, IVA soportado","210,00",""],["","400 Proveedores","","1.210,00"],["01/03","400 Proveedores","1.210,00",""],["","401 Proveedores, efectos comerciales a pagar","","1.210,00"],["30/04","401 Proveedores, efectos comerciales a pagar","1.210,00",""],["","572 Bancos, c/c","","1.210,00"]]],
+["Ejemplo 2. Compra con pagaré","Compra de materias primas por 2.000 € + IVA; la pyme firma un pagaré a 90 días por 2.420 €.","Factura de compra; pagaré emitido",[["##","Pyme compradora (firma el pagaré)"],["10/02","601 Compras de materias primas","2.000,00",""],["","472 HP, IVA soportado","420,00",""],["","400 Proveedores","","2.420,00"],["10/02","400 Proveedores","2.420,00",""],["","401 Proveedores, efectos comerciales a pagar","","2.420,00"],["11/05","401 Proveedores, efectos comerciales a pagar","2.420,00",""],["","572 Bancos, c/c","","2.420,00"],["##","Proveedor (vende y recibe el pagaré)"],["10/02","430 Clientes","2.420,00",""],["","700 Ventas de mercaderías","","2.000,00"],["","477 HP, IVA repercutido","","420,00"],["10/02","4310 Efectos comerciales en cartera","2.420,00",""],["","430 Clientes","","2.420,00"],["11/05","572 Bancos, c/c","2.420,00",""],["","4310 Efectos comerciales en cartera","","2.420,00"]]],
+["Ejemplo 3. Cliente en concurso","El cliente Distribuciones López, con una factura de 1.210 € (IVA incluido), entra en concurso.","Comunicación del concurso",[["31/12","436 Clientes de dudoso cobro","1.210,00",""],["","430 Clientes","","1.210,00"]]],
+["Ejemplo 4. Deterioro al cierre","Al cierre se estima un deterioro del 50 %, es decir 605 €.","Informe de estimación",[["31/12","694 Pérdidas por deterioro de créditos comerciales","605,00",""],["","490 Deterioro de valor de créditos comerciales","","605,00"]]],
+["Ejemplo 5. Venta con envases retornables","Venta de mercaderías por 1.000 € + IVA, con 400 € de envases retornables cobrados como depósito.","Factura de venta con línea de envases",[["##","Pyme vendedora (cobra el depósito)"],["05/03","430 Clientes","1.610,00",""],["","700 Ventas de mercaderías","","1.000,00"],["","477 HP, IVA repercutido","","210,00"],["","437 Envases y embalajes a devolver por clientes","","400,00"],["##","Cliente (compra con envases y paga el depósito)"],["05/03","600 Compras de mercaderías","1.000,00",""],["","472 HP, IVA soportado","210,00",""],["","406 Envases y embalajes a devolver a proveedores","400,00",""],["","572 Bancos, c/c","","1.610,00"]]],
+["Ejemplo 6. Devolución de envases","Seis meses después el cliente devuelve los envases y la pyme le devuelve el depósito de 400 € por transferencia. No genera IVA.","Justificante de devolución y transferencia",[["##","Pyme vendedora"],["10/09","437 Envases y embalajes a devolver por clientes","400,00",""],["","572 Bancos, c/c","","400,00"],["##","Cliente (recupera el depósito, sin IVA)"],["10/09","572 Bancos, c/c","400,00",""],["","406 Envases y embalajes a devolver a proveedores","","400,00"]]],
+["Ejemplo 7. Envase no devuelto","El cliente no devuelve los envases en el plazo fijado. El depósito pasa a ser una venta de envases (704) sujeta a IVA: base 400 € y cuota de 84 € (21 %).","Factura de venta por envases no devueltos",[["##","Pyme vendedora"],["10/12","437 Envases y embalajes a devolver por clientes","400,00",""],["","704 Venta de envases y embalajes","","400,00"],["10/12","430 Clientes","84,00",""],["","477 HP, IVA repercutido","","84,00"],["##","Cliente (no devuelve el envase)"],["10/12","602 Compras de otros aprovisionamientos","400,00",""],["","406 Envases y embalajes a devolver a proveedores","","400,00"],["10/12","472 HP, IVA soportado","84,00",""],["","400 Proveedores","","84,00"]]],
+["Ejemplo 8. Anticipo a proveedor","El 01/10 Muebles Roca paga a Maderas del Sur 300 € + IVA (363 €) antes de recibir la mercancía.","Justificante de pago y factura del anticipo",[["##","Muebles Roca (pyme compradora)"],["01/10","407 Anticipos a proveedores","300,00",""],["","472 HP, IVA soportado","63,00",""],["","572 Bancos, c/c","","363,00"],["##","Maderas del Sur (proveedor, vendedora)"],["01/10","572 Bancos, c/c","363,00",""],["","438 Anticipos de clientes","","300,00"],["","477 HP, IVA repercutido","","63,00"]]],
+["Ejemplo 8 bis. Anticipo de cliente","El 15/09 Distribuciones López encarga a Muebles Roca un mobiliario de 1.000 € + IVA y paga 605 € (500 € + 105 € de IVA) como anticipo.","Justificante de cobro y factura del anticipo",[["##","Muebles Roca (pyme vendedora)"],["15/09","572 Bancos, c/c","605,00",""],["","438 Anticipos de clientes","","500,00"],["","477 HP, IVA repercutido","","105,00"],["##","Distribuciones López (cliente, compradora)"],["15/09","407 Anticipos a proveedores","500,00",""],["","472 HP, IVA soportado","105,00",""],["","572 Bancos, c/c","","605,00"]]],
+["Ejemplo 9. Regularización del anticipo a proveedor","El 15/10 llega la factura de Maderas del Sur por 1.000 € + IVA (1.210 €). El anticipo de 363 € se descuenta y el saldo de 847 € se paga por banco.","Factura del proveedor y factura de la pyme",[["##","Muebles Roca (pyme compradora)"],["15/10","600 Compras de mercaderías","1.000,00",""],["","472 HP, IVA soportado","210,00",""],["","400 Proveedores","","1.210,00"],["15/10","400 Proveedores","363,00",""],["","407 Anticipos a proveedores","","300,00"],["","472 HP, IVA soportado","","63,00"],["15/10","400 Proveedores","847,00",""],["","572 Bancos, c/c","","847,00"],["##","Maderas del Sur (proveedor, vendedora)"],["15/10","430 Clientes","1.210,00",""],["","700 Ventas de mercaderías","","1.000,00"],["","477 HP, IVA repercutido","","210,00"],["15/10","438 Anticipos de clientes","300,00",""],["","477 HP, IVA repercutido","63,00",""],["","430 Clientes","","363,00"],["15/10","572 Bancos, c/c","847,00",""],["","430 Clientes","","847,00"]]],
+["Ejemplo 9 bis. Regularización del anticipo de cliente","El 20/11 Muebles Roca entrega el mobiliario y factura 1.000 € + IVA (1.210 €). El anticipo de 605 € se descuenta y el resto se cobra por banco.","Factura de venta y factura recibida",[["##","Muebles Roca (pyme vendedora)"],["20/11","430 Clientes","1.210,00",""],["","700 Ventas de mercaderías","","1.000,00"],["","477 HP, IVA repercutido","","210,00"],["20/11","438 Anticipos de clientes","500,00",""],["","477 HP, IVA repercutido","105,00",""],["","430 Clientes","","605,00"],["20/11","572 Bancos, c/c","605,00",""],["","430 Clientes","","605,00"],["##","Distribuciones López (cliente, compradora)"],["20/11","600 Compras de mercaderías","1.000,00",""],["","472 HP, IVA soportado","210,00",""],["","400 Proveedores","","1.210,00"],["20/11","400 Proveedores","500,00",""],["","407 Anticipos a proveedores","","500,00"],["20/11","400 Proveedores","105,00",""],["","472 HP, IVA soportado","","105,00"],["20/11","400 Proveedores","605,00",""],["","572 Bancos, c/c","","605,00"]]],
+["Ejemplo 10. Servicio de gestoría con pagaré","La gestoría factura 500 € + IVA (605 €); la pyme entrega un pagaré a 60 días.","Factura de servicios; pagaré emitido",[["##","Pyme compradora del servicio"],["02/11","623 Servicios de profesionales independientes","500,00",""],["","472 HP, IVA soportado","105,00",""],["","410 Acreedores por prestaciones de servicios","","605,00"],["02/11","410 Acreedores por prestaciones de servicios","605,00",""],["","411 Acreedores, efectos comerciales a pagar","","605,00"],["01/01","411 Acreedores, efectos comerciales a pagar","605,00",""],["","572 Bancos, c/c","","605,00"],["##","Gestoría (prestadora del servicio)"],["02/11","430 Clientes","605,00",""],["","705 Prestaciones de servicios","","500,00"],["","477 HP, IVA repercutido","","105,00"],["02/11","4310 Efectos comerciales en cartera","605,00",""],["","430 Clientes","","605,00"],["01/01","572 Bancos, c/c","605,00",""],["","4310 Efectos comerciales en cartera","","605,00"]]],
+["Ejemplo 11. Formación con letra del cliente","Servicio de formación por 2.000 € + IVA (2.420 €); el cliente acepta una letra a 90 días.","Factura de servicios; letra aceptada",[["##","Pyme prestadora del servicio"],["10/11","440 Deudores","2.420,00",""],["","705 Prestaciones de servicios","","2.000,00"],["","477 HP, IVA repercutido","","420,00"],["10/11","441 Deudores, efectos comerciales a cobrar","2.420,00",""],["","440 Deudores","","2.420,00"],["08/02","572 Bancos, c/c","2.420,00",""],["","441 Deudores, efectos comerciales a cobrar","","2.420,00"],["##","Cliente (recibe el servicio y acepta la letra)"],["10/11","629 Otros servicios","2.000,00",""],["","472 HP, IVA soportado","420,00",""],["","400 Proveedores","","2.420,00"],["10/11","400 Proveedores","2.420,00",""],["","401 Proveedores, efectos comerciales a pagar","","2.420,00"],["08/02","401 Proveedores, efectos comerciales a pagar","2.420,00",""],["","572 Bancos, c/c","","2.420,00"]]],
+["Ejemplo 12. Descuento de un efecto","Letra de 1.210 € a 60 días en cartera; el banco cobra 30 € de intereses y gastos.","Letra; nota de abono del banco",[["01/03","4311 Efectos comerciales descontados","1.210,00",""],["","4310 Efectos comerciales en cartera","","1.210,00"],["01/03","572 Bancos, c/c","1.180,00",""],["","665 Intereses por descuento de efectos","30,00",""],["","5208 Deudas por efectos descontados","","1.210,00"]]],
+["Ejemplo 13. Vencimiento pagado al banco","El cliente paga al banco el día del vencimiento y la deuda queda cancelada.","Nota del banco",[["30/04","5208 Deudas por efectos descontados","1.210,00",""],["","4311 Efectos comerciales descontados","","1.210,00"]]],
+["Ejemplo 14. Efecto descontado impagado","El banco carga el importe a la pyme y el efecto pasa a 4315. Los gastos de devolución son 30 €.","Nota de cargo del banco",[["30/04","5208 Deudas por efectos descontados","1.210,00",""],["","572 Bancos, c/c","","1.210,00"],["30/04","4315 Efectos comerciales impagados","1.210,00",""],["","4311 Efectos comerciales descontados","","1.210,00"],["30/04","626 Servicios bancarios y similares","30,00",""],["","572 Bancos, c/c","","30,00"]]],
+["Ejemplo 15. Remesa para cobro","Letra de 1.210 € enviada al banco para cobro; comisión de 10 €.","Remesa de efectos",[["01/03","4312 Efectos comerciales en gestión de cobro","1.210,00",""],["","4310 Efectos comerciales en cartera","","1.210,00"],["01/03","626 Servicios bancarios y similares","10,00",""],["","572 Bancos, c/c","","10,00"]]],
+["Ejemplo 16. Cobro en gestión","El banco abona el importe en el vencimiento.","Nota de abono del banco",[["30/04","572 Bancos, c/c","1.210,00",""],["","4312 Efectos comerciales en gestión de cobro","","1.210,00"]]],
+["Ejemplo 17. Impagado en gestión de cobro","El banco devuelve el efecto a la pyme, que lo reclama al cliente.","Devolución del efecto por el banco",[["30/04","4315 Efectos comerciales impagados","1.210,00",""],["","4312 Efectos comerciales en gestión de cobro","","1.210,00"]]],
+["Ejemplo 18. Anticipo a un trabajador","El 15/03 la pyme adelanta 200 € a un trabajador.","Justificante firmado por el trabajador",[["15/03","460 Anticipos de remuneraciones","200,00",""],["","572 Bancos, c/c","","200,00"]]],
+["Ejemplo 19. Nómina con anticipo descontado","Salario bruto 2.000 €; IRPF del 15 % (300 €); cotización del trabajador 127 €; cotización de la empresa 600 €; anticipo de 200 €. Líquido: 1.373 €.","Recibo de salarios",[["31/03","640 Sueldos y salarios","2.000,00",""],["","475 HP, acreedora por retenciones","","300,00"],["","476 Organismos de la Seguridad Social, acreedores","","127,00"],["","460 Anticipos de remuneraciones","","200,00"],["","465 Remuneraciones pendientes de pago","","1.373,00"],["31/03","642 Seguridad Social a cargo de la empresa","600,00",""],["","476 Organismos de la Seguridad Social, acreedores","","600,00"]]],
+["Ejemplo 20. Nómina que queda a deber","La nómina se abona el 5 del mes siguiente; el saldo se mantiene en 465 hasta el pago.","Transferencia de nómina",[["05/04","465 Remuneraciones pendientes de pago","1.373,00",""],["","572 Bancos, c/c","","1.373,00"]]],
+["Ejemplo 21. Gasto anticipado: seguro","El 01/07 se paga un seguro anual de 1.200 €. Al cierre han pasado 6 meses.","Póliza y recibo de pago",[["01/07","480 Gastos anticipados","1.200,00",""],["","572 Bancos, c/c","","1.200,00"],["31/12","625 Primas de seguros","600,00",""],["","480 Gastos anticipados","","600,00"]]],
+["Ejemplo 22. Ingreso anticipado: alquiler","El 01/10 se cobran 2.400 € de alquiler por 12 meses. Al cierre han pasado 3 meses.","Recibo del alquiler",[["01/10","572 Bancos, c/c","2.400,00",""],["","485 Ingresos anticipados","","2.400,00"],["31/12","485 Ingresos anticipados","600,00",""],["","752 Ingresos por arrendamientos","","600,00"]]],
+["Ejemplo 23. Reversión del deterioro","El cliente del ejemplo 3 paga la factura completa de 1.210 €, que tenía un deterioro de 605 €.","Justificante de cobro",[["15/03","572 Bancos, c/c","1.210,00",""],["","436 Clientes de dudoso cobro","","1.210,00"],["15/03","490 Deterioro de valor de créditos comerciales","605,00",""],["","790 Reversión del deterioro","","605,00"]]],
+["Ejemplo 24. Baja por insolvencia con recuperación del IVA","La deuda de 1.210 € (base 1.000 € + IVA 210 €) se declara incobrable; la provisión de 605 € ya estaba registrada. Se cumplen los requisitos del artículo 80 de la Ley del IVA.","Declaración de insolvencia",[["30/06","477 HP, IVA repercutido","210,00",""],["","490 Deterioro de valor de créditos comerciales","605,00",""],["","694 Pérdidas por deterioro de créditos comerciales","395,00",""],["","436 Clientes de dudoso cobro","","1.210,00"]]],
+["Ejercicio resuelto. Muebles Roca","Muebles Roca vende a Hogar Sur mobiliario por 3.000 € + IVA. Hogar Sur acepta una letra a 60 días. El 05/03 Muebles Roca la descuenta en el banco, que cobra 40 € de intereses y gastos. Al vencer, el 30/04, Hogar Sur paga al banco.","Factura; letra; nota del banco",[["01/03","430 Clientes","3.630,00",""],["","700 Ventas de mercaderías","","3.000,00"],["","477 HP, IVA repercutido","","630,00"],["01/03","4310 Efectos comerciales en cartera","3.630,00",""],["","430 Clientes","","3.630,00"],["05/03","4311 Efectos comerciales descontados","3.630,00",""],["","4310 Efectos comerciales en cartera","","3.630,00"],["05/03","572 Bancos, c/c","3.590,00",""],["","665 Intereses por descuento de efectos","40,00",""],["","5208 Deudas por efectos descontados","","3.630,00"],["30/04","5208 Deudas por efectos descontados","3.630,00",""],["","4311 Efectos comerciales descontados","","3.630,00"]]]
+];
+
+/* ---------- EJERCICIOS: [enunciado, filas de solución] ---------- */
+const EJERCICIOS = [
+["1. La pyme compra mercaderías a un proveedor por 800 € + IVA y firma un pagaré a 90 días. Contabiliza la factura y la emisión del pagaré.",[["##","(1) Factura de compra: 800 € + 168 € de IVA"],["","600 Compras de mercaderías","800,00",""],["","472 HP, IVA soportado","168,00",""],["","400 Proveedores","","968,00"],["##","(2) Pagaré a 90 días por 968 €: la deuda pasa de 400 a 401"],["","400 Proveedores","968,00",""],["","401 Proveedores, efectos comerciales a pagar","","968,00"]]],
+["2. Un cliente con una factura pendiente de 2.420 € (IVA incluido) entra en concurso. Contabiliza el traspaso a dudoso cobro y la provisión del 100 %.",[["","436 Clientes de dudoso cobro","2.420,00",""],["","430 Clientes","","2.420,00"],["","694 Pérdidas por deterioro de créditos comerciales","2.420,00",""],["","490 Deterioro de valor de créditos comerciales","","2.420,00"]]],
+["3. La pyme paga 200 € de anticipo a un proveedor, más 42 € de IVA. Después recibe la factura por 1.000 € + IVA. Contabiliza el anticipo y su regularización.",[["##","Pyme compradora"],["","407 Anticipos a proveedores","200,00",""],["","472 HP, IVA soportado","42,00",""],["","572 Bancos, c/c","","242,00"],["","600 Compras de mercaderías","1.000,00",""],["","472 HP, IVA soportado","210,00",""],["","400 Proveedores","","1.210,00"],["","400 Proveedores","242,00",""],["","407 Anticipos a proveedores","","200,00"],["","472 HP, IVA soportado","","42,00"],["","400 Proveedores","968,00",""],["","572 Bancos, c/c","","968,00"],["##","Proveedor (pyme vendedora)"],["","572 Bancos, c/c","242,00",""],["","438 Anticipos de clientes","","200,00"],["","477 HP, IVA repercutido","","42,00"],["","430 Clientes","1.210,00",""],["","700 Ventas de mercaderías","","1.000,00"],["","477 HP, IVA repercutido","","210,00"],["","438 Anticipos de clientes","200,00",""],["","477 HP, IVA repercutido","42,00",""],["","430 Clientes","","242,00"],["","572 Bancos, c/c","968,00",""],["","430 Clientes","","968,00"]]],
+["4. La pyme vende mercancías por 1.000 € + IVA con 8 envases retornables cobrados como depósito de 20 € cada uno. Contabiliza la venta y la devolución de los envases a los 3 meses.",[["","430 Clientes","1.370,00",""],["","700 Ventas de mercaderías","","1.000,00"],["","477 HP, IVA repercutido","","210,00"],["","437 Envases y embalajes a devolver por clientes","","160,00"],["","437 Envases y embalajes a devolver por clientes","160,00",""],["","572 Bancos, c/c","","160,00"]]],
+["5. Un cliente acepta una letra de 1.210 € a 60 días y la pyme la descuenta en el banco, que cobra 30 € de intereses y gastos. Contabiliza el descuento.",[["","4311 Efectos comerciales descontados","1.210,00",""],["","4310 Efectos comerciales en cartera","","1.210,00"],["","572 Bancos, c/c","1.180,00",""],["","665 Intereses por descuento de efectos","30,00",""],["","5208 Deudas por efectos descontados","","1.210,00"]]],
+["6. Una letra de 2.420 € a 90 días se descuenta en el banco, que cobra 50 €. Al vencer, el cliente no paga y el banco carga el importe a la pyme. Contabiliza el descuento y el impago.",[["","4311 Efectos comerciales descontados","2.420,00",""],["","4310 Efectos comerciales en cartera","","2.420,00"],["","572 Bancos, c/c","2.370,00",""],["","665 Intereses por descuento de efectos","50,00",""],["","5208 Deudas por efectos descontados","","2.420,00"],["","5208 Deudas por efectos descontados","2.420,00",""],["","572 Bancos, c/c","","2.420,00"],["","4315 Efectos comerciales impagados","2.420,00",""],["","4311 Efectos comerciales descontados","","2.420,00"]]],
+["7. La pyme envía al banco para cobro una letra de 605 €. El banco cobra 8 € de comisión y abona el importe en el vencimiento. Contabiliza la remesa, la comisión y el cobro.",[["","4312 Efectos comerciales en gestión de cobro","605,00",""],["","4310 Efectos comerciales en cartera","","605,00"],["","626 Servicios bancarios y similares","8,00",""],["","572 Bancos, c/c","","8,00"],["","572 Bancos, c/c","605,00",""],["","4312 Efectos comerciales en gestión de cobro","","605,00"]]],
+["8. Salario bruto de 1.500 €, con anticipo previo de 150 €, retención IRPF del 12 % (180 €), cotización del trabajador de 95 € y cotización de la empresa de 480 €. Contabiliza la nómina.",[["","640 Sueldos y salarios","1.500,00",""],["","475 HP, acreedora por retenciones","","180,00"],["","476 Organismos de la Seguridad Social, acreedores","","95,00"],["","460 Anticipos de remuneraciones","","150,00"],["","465 Remuneraciones pendientes de pago","","1.075,00"],["","642 Seguridad Social a cargo de la empresa","480,00",""],["","476 Organismos de la Seguridad Social, acreedores","","480,00"]]],
+["9. El 01/04 la pyme paga un seguro anual de 960 €. Contabiliza el pago y el ajuste del 31/12.",[["01/04","480 Gastos anticipados","960,00",""],["","572 Bancos, c/c","","960,00"],["31/12","625 Primas de seguros","720,00",""],["","480 Gastos anticipados","","720,00"]]],
+["10. El 01/09 la pyme cobra 2.400 € de alquiler por 12 meses (de septiembre a agosto). Contabiliza el cobro y el ajuste del 31/12.",[["01/09","572 Bancos, c/c","2.400,00",""],["","485 Ingresos anticipados","","2.400,00"],["31/12","485 Ingresos anticipados","800,00",""],["","752 Ingresos por arrendamientos","","800,00"]]],
+["11. Una deuda de 1.000 € de un cliente pasa a 436 y se deteriora al 40 %. Contabiliza el traspaso y el deterioro y, al año siguiente, el cobro íntegro de la deuda con reversión del deterioro.",[["","436 Clientes de dudoso cobro","1.000,00",""],["","430 Clientes","","1.000,00"],["","694 Pérdidas por deterioro de créditos comerciales","400,00",""],["","490 Deterioro de valor de créditos comerciales","","400,00"],["(año 2)","572 Bancos, c/c","1.000,00",""],["","436 Clientes de dudoso cobro","","1.000,00"],["(año 2)","490 Deterioro de valor de créditos comerciales","400,00",""],["","790 Reversión del deterioro","","400,00"]]]
+];
+
+/* ---------- BANCO DE PREGUNTAS: [pregunta, [4 opciones], índice correcto, pista] ---------- */
+const BANK = [
+["¿Qué es un efecto comercial?",["Un pago en efectivo inmediato","Un documento de crédito que aplaza el pago de una operación comercial","Un préstamo bancario a largo plazo","Un cheque al portador"],1,"Piensa en el aplazamiento del pago."],
+["Efecto que emite el acreedor y que el deudor debe aceptar:",["Pagaré","Letra de cambio","Recibo domiciliado","Cheque"],1,"El librador ordena el pago."],
+["Efecto en el que el propio deudor firma la promesa de pagar:",["Letra de cambio","Pagaré","Cheque","Recibo domiciliado"],1,"Quien firma es quien debe."],
+["Efecto habitual para suministros y cuotas periódicas:",["Letra de cambio","Pagaré","Recibo domiciliado","Cheque"],2,"Se carga directamente en la cuenta bancaria."],
+["Un cheque es un efecto a plazo:",["Sí, siempre","No, es una orden de pago a la vista","Sí, a 90 días","Depende del importe"],1,"Un cheque se paga al presentarlo."],
+["Subcuenta de efectos en cartera:",["4310","4311","4312","4315"],0,"Es la primera de la serie 431."],
+["Subcuenta de efectos descontados:",["4310","4311","4312","4315"],1,"Es la segunda de la serie 431."],
+["Subcuenta de efectos en gestión de cobro:",["4310","4311","4312","4315"],2,"Es la tercera de la serie 431."],
+["Subcuenta de efectos impagados:",["4310","4311","4312","4315"],3,"Es la última de la serie 431."],
+["Cuenta de clientes de dudoso cobro:",["430","436","441","445"],1,"Pertenece al subgrupo 43."],
+["Cuenta de deudores de dudoso cobro:",["440","441","445","436"],2,"Pertenece al subgrupo 44."],
+["Envases y embalajes a devolver por clientes:",["437","438","472","477"],0,"Es de envases, subgrupo 43."],
+["Anticipos de clientes:",["407","438","460","465"],1,"Subgrupo 43."],
+["Anticipos a proveedores:",["407","438","460","465"],0,"Subgrupo 40."],
+["Acreedores por prestaciones de servicios:",["400","410","430","440"],1,"Subgrupo 41."],
+["Acreedores, efectos comerciales a pagar:",["401","411","431","441"],1,"Subgrupo 41 con efectos."],
+["Deudores, efectos comerciales a cobrar:",["411","431","441","445"],2,"Subgrupo 44 con efectos."],
+["IVA repercutido:",["472","477","475","476"],1,"Es el IVA de las ventas."],
+["IVA soportado:",["472","477","475","476"],0,"Es el IVA de las compras."],
+["¿Qué documento justifica una venta a crédito?",["Factura de venta","Recibo de nómina","Póliza de seguro","Pagaré"],0,"Recoge la operación comercial."],
+["Un cliente entra en concurso y su deuda pasa a dudosa. Asiento:",["Debe 436 / Haber 430","Debe 430 / Haber 436","Debe 572 / Haber 436","Debe 436 / Haber 572"],0,"El saldo pasa a clientes de dudoso cobro."],
+["Deterioro del 50 % de 1.210 €:",["605 €","1.210 €","121 €","600 €"],0,"Es la mitad."],
+["Cuenta de gasto del deterioro:",["490","694","790","465"],1,"Es un gasto."],
+["Cuenta de corrección de valor del deterioro:",["490","694","790","436"],0,"Reduce el activo."],
+["Reversión del deterioro:",["694 (debe)","790 (haber)","490 (debe)","436 (haber)"],1,"Es un ingreso."],
+["Un cliente paga la factura de 1.210 € que tenía un deterioro de 605 €. Reversión por:",["790 por 605 €","694 por 605 €","490 por 1.210 €","436 por 605 €"],0,"La provisión vuelve a resultados como ingreso."],
+["Baja definitiva de 1.210 € con provisión de 605 € ya registrada:",["Debe 490 y 694 / Haber 436","Debe 436 / Haber 490","Debe 572 / Haber 436","Debe 694 / Haber 490"],0,"La provisión se usa y el resto va a gasto."],
+["¿Cuándo se registra el deterioro?",["Solo al cobrar","Al cierre, cuando hay riesgo de impago","Al vencer el efecto","Nunca"],1,"Es una estimación de riesgo."],
+["Envases cobrados como depósito al cliente en la venta:",["Debe 430 / Haber 437","Debe 437 / Haber 430","Debe 572 / Haber 437","Debe 700 / Haber 437"],0,"El depósito es una deuda con el cliente."],
+["El cliente devuelve los envases y la pyme le abona el depósito:",["Debe 437 / Haber 430","Debe 430 / Haber 437","Debe 572 / Haber 437","Debe 700 / Haber 437"],0,"Se cancela la deuda con el cliente."],
+["Envase no devuelto: destino del depósito:",["Pasivo a largo plazo","Ingreso (cuenta 704) con IVA repercutido en 477","Gasto financiero","Patrimonio neto"],1,"Pasa a ser una venta de envases: 704 por la base y 477 por la cuota."],
+["Un anticipo a proveedor de 300 € + IVA se registra:",["407 al debe","407 al haber","438 al debe","460 al haber"],0,"Es un derecho frente al proveedor."],
+["Un cliente paga un anticipo de 500 € antes de la entrega:",["Debe 572 / Haber 438","Debe 438 / Haber 572","Debe 700 / Haber 438","Debe 572 / Haber 700"],0,"Es una deuda con el cliente."],
+["¿Un anticipo de cliente es ingreso en el momento del cobro?",["No, es deuda hasta la entrega","Sí, siempre","Es gasto","Es activo"],0,"Hasta entregar el bien es una deuda."],
+["Factura de compra de 1.000 € + IVA:",["Debe 600 1.000 y 472 210 / Haber 400 1.210","Debe 400 / Haber 600","Debe 477 / Haber 600","Debe 600 / Haber 572"],0,"El gasto va al debe y el proveedor al haber."],
+["Venta a crédito de 1.000 € + IVA:",["Debe 430 1.210 / Haber 700 1.000 y 477 210","Debe 700 / Haber 430","Debe 572 / Haber 700","Debe 430 / Haber 477"],0,"El cliente es deudor por el total."],
+["Emisión de un pagaré por una factura de servicios de 605 €:",["Debe 410 / Haber 411","Debe 411 / Haber 410","Debe 572 / Haber 411","Debe 410 / Haber 572"],0,"La deuda por servicio pasa a efecto."],
+["Pago al vencimiento de un pagaré emitido a un acreedor:",["Debe 411 / Haber 572","Debe 572 / Haber 411","Debe 410 / Haber 572","Debe 572 / Haber 410"],0,"Se cancela el efecto a pagar."],
+["Un efecto a cobrar se registra inicialmente en:",["4310 Efectos comerciales en cartera","4311","5208","4315"],0,"Todavía no se ha descontado ni enviado al banco."],
+["Documento de origen de un anticipo de cliente:",["Factura de anticipo","Recibo domiciliado","Póliza de seguro","Presupuesto de compra"],0,"Es un documento de venta."],
+["Cuenta de deuda con el banco por efectos descontados:",["5208","4311","665","572"],0,"Es la serie 52."],
+["Intereses por descuento de efectos:",["665","662","626","694"],0,"Es un gasto financiero por descuento."],
+["Descuento de 1.210 € con 30 € de gastos: importe que abona el banco:",["1.180 €","1.210 €","1.240 €","30 €"],0,"Nominal menos gastos."],
+["Asiento del descuento del efecto:",["Debe 572 y 665 / Haber 5208","Debe 5208 / Haber 572","Debe 572 / Haber 4311","Debe 665 / Haber 572"],0,"El banco abona neto."],
+["El cliente paga al banco en el vencimiento del efecto descontado:",["Debe 5208 / Haber 4311","Debe 4311 / Haber 5208","Debe 572 / Haber 5208","Debe 665 / Haber 4311"],0,"Se cancela la deuda con el banco."],
+["Un efecto descontado que el banco devuelve por impago. Asiento de la pyme:",["Debe 4315 / Haber 4311","Debe 4311 / Haber 4315","Debe 572 / Haber 4315","Debe 4315 / Haber 572"],0,"El efecto descontado pasa a impagado."],
+["Diferencia entre descuento y gestión de cobro:",["En el descuento hay deuda con el banco (5208); en gestión de cobro no","En gestión de cobro hay deuda con el banco","Son idénticos","No hay diferencia"],0,"Piensa quién asume la deuda."],
+["En gestión de cobro, el efecto pasa de cartera a:",["4312","4311","5208","4315"],0,"Lo cobra el banco."],
+["Comisión bancaria por gestión de cobro:",["626","665","662","694"],0,"Son servicios bancarios."],
+["Cobro de un efecto en gestión de cobro:",["Debe 572 / Haber 4312","Debe 4312 / Haber 572","Debe 572 / Haber 4310","Debe 5208 / Haber 572"],0,"Entra dinero en el banco."],
+["Efecto devuelto en gestión de cobro:",["Debe 4315 / Haber 4312","Debe 4312 / Haber 4315","Debe 572 / Haber 4315","Debe 4315 / Haber 572"],0,"Pasa a impagado."],
+["Cuando el banco devuelve un efecto en gestión de cobro, la pyme:",["No recupera nada","Reclama al cliente el importe","Paga al cliente","Lo anula sin asiento"],1,"El derecho de cobro sigue vivo."],
+["Un efecto descontado sin recurso:",["El banco asume el riesgo de impago","La pyme responde siempre","El cliente no debe nada","Es un gasto"],0,"Sin recurso el riesgo pasa al banco."],
+["Descuento con recurso, si el cliente no paga:",["El banco puede cargar el importe a la pyme","El banco pierde el dinero","No pasa nada","Paga el proveedor"],0,"Con recurso, la pyme responde."],
+["Documento que justifica un descuento de efectos:",["Letra aceptada y nota de cargo del banco","Recibo de nómina","Póliza de seguro","Presupuesto"],0,"Es el efecto y la liquidación bancaria."],
+["Recibo domiciliado cobrado:",["Debe 572 / Haber 430","Debe 430 / Haber 572","Debe 572 / Haber 440","Debe 410 / Haber 572"],0,"Entra dinero y se reduce el derecho de cobro."],
+["Subcuenta que sustituye a 4310 cuando se descuenta un efecto:",["4311","4312","5208","4315"],0,"Es el efecto descontado."],
+["Hacienda Pública acreedora por el IVA repercutido en un anticipo cobrado:",["477","472","438","407"],0,"Es IVA repercutido por el vendedor."],
+["¿Qué diferencia hay entre 4312 y 4311?",["4312 es gestión de cobro y 4311 es descontado","Son la misma cuenta","4312 es impagado y 4311 es cartera","4312 es deuda con el banco"],0,"Piensa quién cobra el efecto."],
+["Anticipo de remuneraciones:",["460","465","475","476"],0,"Es un derecho frente al trabajador."],
+["Remuneraciones pendientes de pago:",["460","465","475","476"],1,"Es una deuda con el personal."],
+["Retención de IRPF en la nómina:",["475","476","460","465"],0,"Es la Hacienda acreedora."],
+["Cotización del trabajador a la Seguridad Social:",["475","476","642","465"],1,"Son organismos de la Seguridad Social acreedores."],
+["Seguridad Social a cargo de la empresa:",["640","642","476","625"],1,"Es un gasto de personal."],
+["Líquido de la nómina con anticipo descontado:",["Se resta el anticipo del líquido a pagar","El anticipo es un ingreso","El anticipo va al debe de 465","El anticipo va a 640"],0,"El anticipo se descuenta."],
+["Pago de un anticipo de 200 € al trabajador:",["Debe 460 / Haber 572","Debe 572 / Haber 460","Debe 465 / Haber 572","Debe 640 / Haber 572"],0,"La pyme tiene un derecho frente al trabajador."],
+["Nómina no pagada al cierre: cuenta que la recoge:",["465","460","572","640"],0,"Sigue siendo una deuda."],
+["Pago de la nómina pendiente:",["Debe 465 / Haber 572","Debe 572 / Haber 465","Debe 640 / Haber 572","Debe 460 / Haber 465"],0,"Se cancela la deuda con el personal."],
+["Naturaleza de la cuenta 460:",["Deudora (activo)","Acreedora (pasivo)","Gasto","Ingreso"],0,"Es lo que el trabajador debe a la pyme."],
+["Gasto anticipado: cuenta del activo:",["480","485","625","752"],0,"Es un gasto del ejercicio siguiente."],
+["Ingreso anticipado:",["480","485","752","705"],1,"Es cobrado y todavía no ganado."],
+["Seguro de 1.200 € pagado el 1 de julio; parte del gasto de este ejercicio al cierre:",["600 €","1.200 €","0 €","300 €"],0,"Han pasado 6 de 12 meses."],
+["Alquiler de 2.400 € cobrado el 1 de octubre por 12 meses; ingreso del año al 31 de diciembre:",["600 €","1.800 €","2.400 €","0 €"],0,"Han pasado 3 de 12 meses."],
+["Ajuste de gasto anticipado:",["Debe 625 / Haber 480","Debe 480 / Haber 625","Debe 572 / Haber 480","Debe 625 / Haber 572"],0,"Se reconoce el gasto del ejercicio."],
+["Ajuste de ingreso anticipado:",["Debe 485 / Haber 752","Debe 752 / Haber 485","Debe 572 / Haber 752","Debe 485 / Haber 572"],0,"Se reconoce el ingreso ganado."],
+["Principio que justifica la periodificación:",["Devengo","Prudencia","Empresa en funcionamiento","Uniformidad"],0,"Imputar al ejercicio correcto."],
+["Documento que justifica un seguro pagado por anticipado:",["Póliza y recibo de pago","Recibo domiciliado","Pagaré","Letra de cambio"],0,"Es el contrato y el pago."],
+["Documento que justifica un anticipo de remuneración:",["Justificante firmado por el trabajador","Letra de cambio","Pagaré","Factura de venta"],0,"Es un documento interno firmado."],
+["Naturaleza de la cuenta 480:",["Deudora (activo)","Acreedora (pasivo)","Gasto del ejercicio","Ingreso"],0,"Es un derecho sobre gastos futuros."],
+["Naturaleza de la cuenta 5208:",["Acreedora (pasivo)","Deudora (activo)","Gasto","Ingreso"],0,"Es una deuda con el banco."],
+["Naturaleza de la cuenta 490:",["Acreedora (reduce el activo)","Deudora","Ingreso","Pasivo a largo plazo"],0,"Es una corrección de valor."],
+["Naturaleza de la cuenta 694:",["Deudora (gasto)","Acreedora (ingreso)","Activo","Pasivo"],0,"Es un gasto."],
+["Naturaleza de la cuenta 790:",["Acreedora (ingreso)","Deudora (gasto)","Activo","Pasivo"],0,"Es un ingreso."],
+["Naturaleza de la cuenta 665:",["Deudora (gasto financiero)","Acreedora (ingreso)","Activo","Pasivo"],0,"Es un gasto financiero."],
+["Naturaleza de la cuenta 4311:",["Deudora (activo)","Acreedora (pasivo)","Gasto","Ingreso"],0,"Son efectos a cobrar."],
+["Naturaleza de la cuenta 437 (envases de clientes):",["Acreedora (minora el activo 430)","Deudora (activo)","Gasto","Ingreso"],0,"Minora el saldo de clientes hasta la devolución."],
+["Naturaleza de la cuenta 438:",["Acreedora (pasivo)","Deudora (activo)","Gasto","Ingreso"],0,"Es un anticipo recibido."],
+["Naturaleza de la cuenta 407:",["Deudora (activo)","Acreedora (pasivo)","Gasto","Ingreso"],0,"Es un derecho frente al proveedor."],
+["Naturaleza de la cuenta 436:",["Deudora (activo)","Acreedora (pasivo)","Gasto","Ingreso"],0,"Es un crédito dudoso."],
+["Documento de origen de la nómina:",["Recibo de salarios","Factura de venta","Póliza de seguro","Letra de cambio"],0,"Es el documento del personal."],
+["Gasto de personal que la pyme paga por su parte de las cotizaciones:",["642","640","476","625"],0,"Es la Seguridad Social a cargo de la empresa."],
+["Gasto por devolución de un efecto impagado:",["626","665","662","694"],0,"Son servicios bancarios."],
+["¿Qué cuenta se usa para el IVA de un anticipo de proveedor?",["472","477","475","476"],0,"Es IVA soportado."],
+["Factura de servicios con efecto a pagar: cuenta del efecto:",["411","401","431","441"],0,"Es de acreedores por servicios."],
+["¿Qué ocurre si el deterioro aumenta el año siguiente?",["Se registra más gasto en 694","Se reduce el activo con 436","Se paga al banco","No pasa nada"],0,"Se dota más pérdida."],
+["Cuenta que registra el ingreso al cobrar una deuda deteriorada:",["790","694","490","436"],0,"Es la reversión."],
+["¿Qué ocurre con el IVA al descontar un efecto?",["No se modifica","Se duplica","Se anula","Se paga al banco"],0,"El IVA ya se registró en la venta."],
+["Un anticipo de cliente de 300 € se regulariza con una factura de 1.000 € + IVA. ¿Qué cuenta se carga para cancelar el anticipo?",["407","438","460","465"],1,"Es de clientes."],
+["Cuenta de deudores (cliente de servicios) a la que se carga la factura:",["440","410","430","465"],0,"Es el subgrupo 44."]
+];
+
+/* ---------- RENDER ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function asientoHTML(rows){
+  let h = '<table><tr><th>Fecha</th><th>Cuenta</th><th class="n">Debe</th><th class="n">Haber</th></tr>';
+  rows.forEach(r => {
+    if(r[0]==="##"){ h += '<tr class="sub"><td colspan="4"><b>'+esc(r[1])+'</b></td></tr>'; return; }
+    const isSub = false;
+    h += '<tr class="'+(r[3]&&!r[2]?'sub':'')+'"><td>'+esc(r[0])+'</td><td class="'+(r[3]&&!r[2]?'ind':'')+'">'+esc(r[1])+'</td><td class="n">'+esc(r[2])+'</td><td class="n">'+esc(r[3])+'</td></tr>';
+  });
+  return h + '</table>';
+}
+const DOC_INFO = {
+  "pagare_proveedor": "Pagaré emitido por Muebles Roca a favor de Maderas del Sur (ejemplo 2).",
+  "factura_envases": "Factura con envases retornables: el depósito no forma parte de la base imponible (ejemplo 5).",
+  "justificante_devolucion_envases": "Justificante de la devolución del depósito, sin IVA (ejemplo 6).",
+  "factura_gestoria": "Factura de la gestoría que origina el asiento de servicios (ejemplo 10).",
+  "recibo_nomina": "Recibo de salarios de marzo que sirve de base a la nómina (ejemplo 19).",
+  "factura_venta_muebles": "Factura F/2026/015 de Muebles Roca a Hogar Sur.",
+  "letra_cambio": "Letra de cambio aceptada por Hogar Sur, vencimiento 30/04/2026.",
+  "nota_descuento_efecto": "Nota de abono del banco por el descuento de la letra el 05/03/2026."
+};
+const DOCS_EJ = [["Ejemplo 2.",["pagare_proveedor"]],["Ejemplo 5.",["factura_envases"]],["Ejemplo 6.",["justificante_devolucion_envases"]],["Ejemplo 10.",["factura_gestoria"]],["Ejemplo 19.",["recibo_nomina"]],["Ejercicio resuelto.",["factura_venta_muebles","letra_cambio","nota_descuento_efecto"]]];
+function imgsHTML(title){
+  const f = DOCS_EJ.find(d => title.indexOf(d[0]) === 0);
+  if(!f) return "";
+  return f[1].map(k => '<figure class="docfig"><img src="docs/'+k+'.png" alt="'+esc(DOC_INFO[k])+'" loading="lazy"><figcaption>'+esc(DOC_INFO[k])+'</figcaption></figure>').join("");
+}
+function renderEjemplos(filtro){
+  const f = (filtro||"").toLowerCase();
+  $("listaEj").innerHTML = EJEMPLOS.map(e => {
+    const txt = (e[0]+" "+e[1]+" "+e[2]).toLowerCase();
+    if(f && txt.indexOf(f) < 0) return "";
+    return '<div class="ej"><h3>'+esc(e[0])+'</h3><div class="enun">'+esc(e[1])+'</div><div class="doc">Documento: '+esc(e[2])+'</div>'+imgsHTML(e[0])+asientoHTML(e[3])+'</div>';
+  }).join("");
+}
+function renderEjercicios(){
+  $("listaEx").innerHTML = EJERCICIOS.map(e =>
+    '<div class="ej ex"><h3>Ejercicio</h3><div class="enun">'+esc(e[0])+'</div><details><summary>Ver solución</summary><div>'+asientoHTML(e[1])+'</div></details></div>'
+  ).join("");
+}
+$("buscaEj").addEventListener("input", e => renderEjemplos(e.target.value));
+
+/* Tabs */
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
+  document.querySelectorAll(".view").forEach(x => x.classList.remove("on"));
+  b.classList.add("on"); $("v-"+b.dataset.v).classList.add("on");
+  window.scrollTo({top:0,behavior:"smooth"});
+}));
+/* Índice lateral activo al hacer scroll */
+const links = [...document.querySelectorAll("#sideT a")];
+window.addEventListener("scroll", () => {
+  if(!$("v-teoria").classList.contains("on")) return;
+  let cur = null;
+  links.forEach(a => { const s = document.querySelector(a.getAttribute("href")); if(s && s.getBoundingClientRect().top < 160) cur = a; });
+  links.forEach(a => a.classList.toggle("on", a === cur));
+});
+
+/* ---------- TEST ---------- */
+const KEY = "tema56_test";
+let test = null;
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function saveLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(test)); }catch(e){} }
+function loadLocal(){ try{ const s=localStorage.getItem(KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+
+function renderTest(){
+  const box = $("preguntas"); box.innerHTML = "";
+  $("resultado").innerHTML = "";
+  if(!test){ $("barra").style.width="0"; $("contador").textContent=""; return; }
+  let contestadas = 0;
+  test.ids.forEach((id, k) => {
+    const [q, opts] = BANK[id];
+    if(test.answers[k] !== undefined) contestadas++;
+    let h = '<div class="q"><div class="t">'+(k+1)+'. '+esc(q)+'</div>';
+    opts.forEach((o, oi) => {
+      let cls = "";
+      if(test.graded){
+        if(oi === BANK[id][2]) cls = "right";
+        else if(test.answers[k] === oi) cls = "wrong";
+      } else if(test.answers[k] === oi) cls = "picked";
+      h += '<label class="'+cls+'"><input type="radio" name="p'+k+'" value="'+oi+'" '+(test.answers[k]===oi?"checked":"")+' '+(test.graded?"disabled":"")+'> '+esc(o)+'</label>';
+    });
+    if(!test.graded){
+      h += '<div class="row" style="margin-top:8px"><button class="btn hint" data-h="'+k+'" '+(test.hints[k]?"disabled":"")+'>'+(test.hints[k]?"Pista usada (−0,25)":"Ver pista (−0,25)")+'</button></div>';
+    }
+    if(test.hints[k]) h += '<div class="pista on">Pista: '+esc(BANK[id][3])+'</div>';
+    if(test.graded){
+      const a = test.answers[k], c = BANK[id][2];
+      if(a === undefined) h += '<div class="res sin">Sin responder. Respuesta correcta: '+esc(opts[c])+'</div>';
+      else if(a === c) h += '<div class="res ok">Correcta.</div>';
+      else h += '<div class="res bad">Incorrecta. Respuesta correcta: '+esc(opts[c])+'</div>';
+    }
+    h += '</div>';
+    box.insertAdjacentHTML("beforeend", h);
+  });
+  $("barra").style.width = Math.round(contestadas/20*100)+"%";
+  $("contador").textContent = contestadas+" de 20 respondidas";
+  box.querySelectorAll("input[type=radio]").forEach(inp => inp.addEventListener("change", () => {
+    const k = +inp.name.slice(1); test.answers[k] = +inp.value; saveLocal(); renderTest();
+  }));
+  box.querySelectorAll("button[data-h]").forEach(b => b.addEventListener("click", () => {
+    test.hints[+b.dataset.h] = true; saveLocal(); renderTest();
+  }));
+}
+function startTest(){
+  const name = $("nombre").value.trim();
+  if(!name){ $("msgInicio").textContent = "Escribe tu nombre antes de empezar."; return; }
+  $("msgInicio").textContent = "";
+  test = { name, ids: shuffle(BANK.map((_, i) => i)).slice(0, 20), answers: {}, hints: {}, graded: false, fecha: new Date().toISOString() };
+  saveLocal(); renderTest();
+}
+function score(){
+  let ac=0, fa=0, sin=0, pistas=0, total=0;
+  test.ids.forEach((id, k) => {
+    if(test.hints[k]) pistas++;
+    const a = test.answers[k];
+    if(a === undefined) sin++;
+    else if(a === BANK[id][2]){ ac++; total += 1; }
+    else { fa++; total -= 0.33; }
+  });
+  total -= 0.25 * pistas;
+  const nota = Math.max(0, total) / 2;
+  return { aciertos: ac, fallos: fa, sin_responder: sin, pistas, puntos: Math.round(total*100)/100, nota: Math.round(nota*100)/100 };
+}
+function correct(){
+  if(!test) return;
+  test.graded = true; saveLocal(); renderTest();
+  const s = score();
+  $("resultado").innerHTML = '<div class="score">'+
+    '<div><b>'+s.nota.toFixed(2)+'</b><span>Nota sobre 10</span></div>'+
+    '<div><b>'+s.puntos+'</b><span>Puntos</span></div>'+
+    '<div><b>'+s.aciertos+'</b><span>Aciertos</span></div>'+
+    '<div><b>'+s.fallos+'</b><span>Fallos</span></div>'+
+    '<div><b>'+s.sin_responder+'</b><span>Sin responder</span></div>'+
+    '<div><b>'+s.pistas+'</b><span>Pistas usadas</span></div></div>';
+}
+function reportText(){
+  const s = score();
+  let t = "Test Temas 5 y 6 - "+test.name+"\nFecha: "+test.fecha+"\nNota: "+s.nota.toFixed(2)+" / 10 (puntos "+s.puntos+")\nAciertos "+s.aciertos+" · Fallos "+s.fallos+" · Sin responder "+s.sin_responder+" · Pistas "+s.pistas+"\n\n";
+  test.ids.forEach((id, k) => {
+    const q = BANK[id], a = test.answers[k];
+    t += (k+1)+". "+q[0]+"\n   Respuesta: "+(a===undefined?"(sin responder)":q[1][a])+"\n   Correcta: "+q[1][q[2]]+(test.hints[k]?"  [pista usada]":"")+"\n";
+  });
+  return t;
+}
+function reportJSON(){
+  const s = score();
+  return { alumno: test.name, fecha: test.fecha, nota: s.nota, puntos: s.puntos, aciertos: s.aciertos, fallos: s.fallos, sin_responder: s.sin_responder, pistas: s.pistas,
+    respuestas: test.ids.map((id, k) => { const q = BANK[id], a = test.answers[k]; return { pregunta: q[0], respuesta: a===undefined?null:q[1][a], correcta: q[1][q[2]], pista_usada: !!test.hints[k] }; }) };
+}
+async function descargar(){
+  if(!test){ $("msgEnvio").textContent = "Primero inicia un test."; return; }
+  if(!test.graded) correct();
+  try{
+    const dl = await claude.use("downloads");
+    await dl.save({ filename: "respuestas_"+test.name.replace(/\s+/g,"_")+".json", data: JSON.stringify(reportJSON(), null, 2) });
+    $("msgEnvio").textContent = "Archivo guardado. Envíalo al profesorado tal como lo has descargado.";
+  } catch(e){ $("msgEnvio").textContent = "No se pudo descargar desde esta vista. Usa Copiar informe."; }
+}
+async function copiar(){
+  if(!test){ $("msgEnvio").textContent = "No hay test que copiar."; return; }
+  if(!test.graded) correct();
+  try{ await navigator.clipboard.writeText(reportText()); $("msgEnvio").textContent = "Informe copiado. Pégalo donde te indique el profesorado."; }
+  catch(e){ $("msgEnvio").textContent = "No se pudo copiar automáticamente. Selecciona el texto del informe y cópialo manualmente."; }
+}
+
+$("btnNuevo").addEventListener("click", startTest);
+$("btnCorregir").addEventListener("click", () => { if(!test){ $("msgEnvio").textContent = "Primero inicia un test."; return; } correct(); });
+$("btnEnviar").addEventListener("click", () => { if($("metodo").value === "archivo") descargar(); else copiar(); });
+
+/* Inicio */
+renderEjemplos("");
+renderEjercicios();
+$("galeria").innerHTML = Object.keys(DOC_INFO).map(k => '<div class="card"><figure class="docfig" style="margin:0"><img src="docs/'+k+'.png" alt="'+esc(DOC_INFO[k])+'" loading="lazy"><figcaption>'+esc(DOC_INFO[k])+'</figcaption></figure></div>').join("");
+test = loadLocal();
+if(test){ $("nombre").value = test.name || ""; renderTest(); if(test.graded) correct(); }
+</script>
+</body>
+</html>
